@@ -18,10 +18,18 @@ const App = () => {
     const blogs = await blogService.getAll()
 
     blogs.sort((a, b) => {
-      return a.likes - b.likes
+      return b.likes - a.likes
     })
+
     setBlogs(blogs)
   }
+
+  useEffect(() => {
+    const USER = JSON.parse(window.localStorage.getItem('loggedBloglistUser'))
+
+    blogService.setToken(USER?.token)
+    setUser(USER)
+  }, [])
 
   useEffect(() => {
     if (user) {
@@ -106,12 +114,6 @@ const App = () => {
     </Toggle>
   )
 
-  // const blogForm = () => (
-  //   <Toggle buttonLabel="new blog" ref={blogFormRef}>
-  //     <BlogForm createBlog={func.addBlog} />
-  //   </Toggle>
-  // )
-
   const blogFormRef = useRef()
 
   return (
@@ -124,7 +126,7 @@ const App = () => {
       ) : (
         <>
           <p>
-            {user.name} logged in
+            {user?.name} logged in
             <button onClick={func.handleLogout}>logout</button>
           </p>
           <Toggle buttonLabel="new blog" ref={blogFormRef}>
@@ -135,7 +137,7 @@ const App = () => {
               key={blog.id}
               blog={blog}
               handleLikeClick={() => func.updateBlog(blog, index)}
-              user={user}
+              userId={user.id}
               handleDelete={() => func.deleteBlog(blog, index)}
             />
           ))}
